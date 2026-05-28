@@ -1,7 +1,14 @@
 __pycache__/
 *.pyc
+*.pyo
 .env
+.env.local
 venv/
 .venv/
 *.db
 *.sqlite3
+.pytest_cache/
+.hypothesis/
+.kiro/
+.impeccable/
+frontend/
