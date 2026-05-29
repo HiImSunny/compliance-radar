@@ -41,10 +41,11 @@ export function ReportsClient() {
   const sourceEntries = Object.entries(bySource).sort((a, b) => b[1] - a[1]);
   const maxSourceCount = Math.max(...sourceEntries.map(([, c]) => c), 1);
 
-  // ── 28-day timeline ───────────────────────────────────────────────
+  // ── 90-day timeline ───────────────────────────────────────────────
   const now = new Date();
+  const DAYS = 90;
   const dayData: { date: string; label: string; count: number; dayOfWeek: number; full: Date }[] = [];
-  for (let i = 27; i >= 0; i--) {
+  for (let i = DAYS - 1; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(d.getDate() - i);
     const key = d.toISOString().slice(0, 10);
@@ -54,13 +55,18 @@ export function ReportsClient() {
   }
   const maxDayCount = Math.max(...dayData.map((d) => d.count), 1);
   const totalAlerts = alerts.length;
-  const avgDaily = (totalAlerts / 28).toFixed(1);
+  const avgDaily = (totalAlerts / DAYS).toFixed(1);
   const busiestDay = dayData.reduce((a, b) => (a.count >= b.count ? a : b), dayData[0]);
 
-  // Group into weeks for heatmap
-  const weeks: typeof dayData[] = [];
-  for (let i = 0; i < dayData.length; i += 7) {
-    weeks.push(dayData.slice(i, i + 7));
+  // Group into weeks for heatmap — pad start so first day aligns to correct weekday
+  const firstDayOfWeek = dayData[0].dayOfWeek; // 0=Sun
+  const paddedDays = [
+    ...Array.from({ length: firstDayOfWeek }, (_, i) => null), // leading nulls
+    ...dayData,
+  ];
+  const weeks: (typeof dayData[0] | null)[][] = [];
+  for (let i = 0; i < paddedDays.length; i += 7) {
+    weeks.push(paddedDays.slice(i, i + 7));
   }
 
   return (
@@ -82,7 +88,7 @@ export function ReportsClient() {
         <>
           {/* ── Alert Activity (hero section) ───────────────────────── */}
           <section>
-            <SectionTitle>Alert activity — last 28 days</SectionTitle>
+            <SectionTitle>Alert activity — last 90 days</SectionTitle>
 
             {/* Summary stats */}
             <div className="flex gap-8 mt-4 mb-5">
@@ -101,7 +107,7 @@ export function ReportsClient() {
               ))}
             </div>
 
-            {/* Daily bar chart */}
+            {/* Daily bar chart — show last 90 days */}
             <div className="mt-4">
               <div className="flex items-end gap-[1px] h-24">
                 {dayData.map((day) => {
@@ -128,63 +134,87 @@ export function ReportsClient() {
                   );
                 })}
               </div>
-              {/* Week labels */}
-              <div className="flex mt-1.5">
-                {weeks.map((week, wi) => (
-                  <div key={wi} className="flex-1 flex justify-center">
-                    <span className={MONO_LABEL} style={{ color: "oklch(0.35 0.010 255)", fontSize: "0.50rem" }}>
-                      {week[0] && new Date(week[0].date).getDate() <= 7
-                        ? new Date(week[0].date).toLocaleDateString("en-US", { month: "short" })
-                        : ""}
-                    </span>
-                  </div>
-                ))}
+              {/* Month labels — show at start of each month */}
+              <div className="flex mt-1.5 relative h-4">
+                {dayData.map((day, i) => {
+                  const isFirstOfMonth = day.full.getDate() === 1 || i === 0;
+                  if (!isFirstOfMonth) return <div key={day.date} className="flex-1" />;
+                  return (
+                    <div key={day.date} className="flex-1 relative">
+                      <span
+                        className={MONO_LABEL}
+                        style={{ color: "oklch(0.42 0.010 255)", fontSize: "0.50rem", position: "absolute", left: 0, whiteSpace: "nowrap" }}
+                      >
+                        {day.full.toLocaleDateString("en-US", { month: "short" })}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Heatmap grid */}
-            <div className="flex items-start gap-1.5 mt-6">
-              {/* Day labels */}
-              <div className="flex flex-col gap-px justify-around" style={{ paddingTop: "1.25rem" }}>
+            {/* Heatmap grid — GitHub-style, 90 days */}
+            <div className="flex items-start gap-2 mt-6 overflow-x-auto pb-1">
+              {/* Day-of-week labels */}
+              <div className="flex flex-col shrink-0" style={{ paddingTop: "1.4rem", gap: "3px" }}>
                 {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-                  <span key={i} className={MONO_LABEL} style={{ color: "oklch(0.35 0.010 255)", fontSize: "0.50rem", lineHeight: "16px" }}>
-                    {d}
+                  <span
+                    key={i}
+                    className={MONO_LABEL}
+                    style={{ color: "oklch(0.35 0.010 255)", fontSize: "0.50rem", lineHeight: "14px", height: 14 }}
+                  >
+                    {i % 2 === 1 ? d : ""}
                   </span>
                 ))}
               </div>
 
-              {/* Weeks */}
-              <div className="flex gap-px">
-                {weeks.map((week, wi) => (
-                  <div key={wi} className="flex flex-col gap-px">
-                    <div className="h-[1.25rem]" />
-                    {week.map((day) => {
-                      const intensity = day.count === 0 ? 0 : Math.max(0.15, day.count / maxDayCount);
-                      const isToday = day.date === now.toISOString().slice(0, 10);
-                      return (
-                        <div
-                          key={day.date}
-                          className="rounded-sm heatmap-cell"
-                          title={`${day.label}: ${day.count} alert${day.count !== 1 ? "s" : ""}`}
-                          style={{
-                            width: 16,
-                            height: 16,
-                            background: day.count === 0
-                              ? "oklch(0.215 0.010 255)"
-                              : `oklch(${0.44 + intensity * 0.28} ${0.14 + intensity * 0.06} 200)`,
-                            outline: isToday ? "1px solid oklch(0.72 0.14 200 / 0.6)" : "none",
-                            outlineOffset: "1px",
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                ))}
+              {/* Week columns */}
+              <div className="flex gap-[3px]">
+                {weeks.map((week, wi) => {
+                  // Find first real day in this week to show month label
+                  const firstReal = week.find((d) => d !== null);
+                  const showMonth = firstReal && (firstReal.full.getDate() <= 7 || wi === 0);
+                  return (
+                    <div key={wi} className="flex flex-col gap-[3px]">
+                      {/* Month label row */}
+                      <div className="h-[1.2rem] flex items-center">
+                        {showMonth && (
+                          <span className={MONO_LABEL} style={{ color: "oklch(0.42 0.010 255)", fontSize: "0.50rem", whiteSpace: "nowrap" }}>
+                            {firstReal!.full.toLocaleDateString("en-US", { month: "short" })}
+                          </span>
+                        )}
+                      </div>
+                      {week.map((day, di) => {
+                        if (!day) {
+                          return <div key={`empty-${wi}-${di}`} style={{ width: 14, height: 14 }} />;
+                        }
+                        const intensity = day.count === 0 ? 0 : Math.max(0.15, day.count / maxDayCount);
+                        const isToday = day.date === now.toISOString().slice(0, 10);
+                        return (
+                          <div
+                            key={day.date}
+                            className="rounded-sm heatmap-cell"
+                            title={`${day.label}: ${day.count} alert${day.count !== 1 ? "s" : ""}`}
+                            style={{
+                              width: 14,
+                              height: 14,
+                              background: day.count === 0
+                                ? "oklch(0.215 0.010 255)"
+                                : `oklch(${0.44 + intensity * 0.28} ${0.14 + intensity * 0.06} 200)`,
+                              outline: isToday ? "1px solid oklch(0.72 0.14 200 / 0.7)" : "none",
+                              outlineOffset: "1px",
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Legend */}
-              <div className="flex flex-col justify-end gap-px pb-px ml-1.5">
-                <span className={MONO_LABEL} style={{ color: "oklch(0.35 0.010 255)", fontSize: "0.50rem", lineHeight: "14px" }}>MORE</span>
+              <div className="flex flex-col justify-end gap-[3px] pb-px ml-1 shrink-0">
+                <span className={MONO_LABEL} style={{ color: "oklch(0.35 0.010 255)", fontSize: "0.50rem", lineHeight: "12px" }}>MORE</span>
                 {[1, 0.7, 0.4, 0.15, 0].map((v, i) => (
                   <div
                     key={i}
@@ -198,7 +228,7 @@ export function ReportsClient() {
                     }}
                   />
                 ))}
-                <span className={MONO_LABEL} style={{ color: "oklch(0.35 0.010 255)", fontSize: "0.50rem", lineHeight: "14px" }}>LESS</span>
+                <span className={MONO_LABEL} style={{ color: "oklch(0.35 0.010 255)", fontSize: "0.50rem", lineHeight: "12px" }}>LESS</span>
               </div>
             </div>
           </section>
