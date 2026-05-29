@@ -17,10 +17,12 @@ type Priority = "HIGH" | "WARNING" | "INFO" | "RESOLVED";
 
 // Static definition of standards (no scores — scores are computed from live data)
 const STANDARD_DEFS = [
-  { id: "gdpr",     name: "GDPR Compliance", color: "oklch(0.60 0.18 155)" },
-  { id: "soc2",     name: "SOC2 Type II",    color: "oklch(0.68 0.20 42)"  },
-  { id: "iso27001", name: "ISO 27001 ISMS",  color: "oklch(0.60 0.22 22)"  },
-  { id: "finra",    name: "FINRA / SEC",     color: "oklch(0.72 0.14 200)" },
+  { id: "gdpr",     name: "GDPR Compliance",   color: "oklch(0.60 0.18 155)" },
+  { id: "soc2",     name: "SOC2 Type II",       color: "oklch(0.68 0.20 42)"  },
+  { id: "iso27001", name: "ISO 27001 ISMS",     color: "oklch(0.60 0.22 22)"  },
+  { id: "hipaa",    name: "HIPAA Healthcare",   color: "oklch(0.72 0.18 280)" },
+  { id: "finra",    name: "FINRA Rules",        color: "oklch(0.72 0.14 200)" },
+  { id: "sec",      name: "SEC Cybersecurity",  color: "oklch(0.68 0.16 60)"  },
 ];
 
 function sevToPriority(sev: string): Priority {
@@ -87,10 +89,22 @@ function computeComplianceScores(alerts: Alert[]) {
       color: "oklch(0.60 0.22 22)",
     },
     {
+      id: "hipaa",
+      name: "HIPAA Healthcare",
+      keywords: ["hipaa", "hhs", "phi", "healthcare", "medical", "patient", "health data", "covered entity", "ocr"],
+      color: "oklch(0.72 0.18 280)",
+    },
+    {
       id: "finra",
-      name: "FINRA / SEC",
-      keywords: ["finra", "sec", "broker", "trading", "disclosure", "cybersecurity disclosure", "8-k", "investor"],
+      name: "FINRA Rules",
+      keywords: ["finra", "broker", "dealer", "trading", "supervisory", "wsp", "registered representative"],
       color: "oklch(0.72 0.14 200)",
+    },
+    {
+      id: "sec",
+      name: "SEC Cybersecurity",
+      keywords: ["sec", "cybersecurity disclosure", "8-k", "investor", "material incident", "lr-", "enforcement"],
+      color: "oklch(0.68 0.16 60)",
     },
   ];
 
