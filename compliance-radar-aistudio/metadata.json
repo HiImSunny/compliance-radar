@@ -1,0 +1,6 @@
+{
+  "name": "Compliance Radar",
+  "description": "An interactive, real-time safety, regulatory compliance monitoring and threat intelligence platform powered by Gemini AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
