@@ -12,3 +12,4 @@ venv/
 .kiro/
 .impeccable/
 frontend/
+.vscode/
