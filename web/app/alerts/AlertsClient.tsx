@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAlerts, revalidateAll } from "@/lib/hooks";
 import { api } from "@/lib/api";
@@ -31,6 +31,7 @@ export function AlertsClient() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [scanning, setScanning] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
     let list = alerts;
@@ -55,9 +56,37 @@ export function AlertsClient() {
   const pageAlerts = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
   const selectedAlert = selectedId != null ? alerts.find((a) => a.id === selectedId) : null;
 
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes((e.target as HTMLElement).tagName)) {
+      e.preventDefault();
+      searchRef.current?.focus();
+      return;
+    }
+    if (e.key === "Escape") {
+      clearSelection();
+      return;
+    }
+    if (e.key === "j" || e.key === "k") {
+      if (["INPUT", "TEXTAREA", "SELECT"].includes((e.target as HTMLElement).tagName)) return;
+      e.preventDefault();
+      const visibleIds = pageAlerts.map(a => a.id);
+      if (visibleIds.length === 0) return;
+      const currentIdx = selectedId != null ? visibleIds.indexOf(selectedId) : -1;
+      const nextIdx = e.key === "j"
+        ? Math.min(currentIdx + 1, visibleIds.length - 1)
+        : Math.max(currentIdx - 1, 0);
+      selectAlert(visibleIds[nextIdx]);
+    }
+  }, [pageAlerts, selectedId]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   async function handleScan() {
     setScanning(true);
-    try { await api.scan(); revalidateAll(); } catch { /* ignore */ } finally { setScanning(false); }
+    try { await api.scan(); revalidateAll(); } catch (e) { console.error("Scan failed:", e); } finally { setScanning(false); }
   }
 
   function selectAlert(id: number) {
@@ -75,10 +104,11 @@ export function AlertsClient() {
       {/* Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="mono text-[0.65rem] tracking-widest uppercase mr-2" style={{ color: "oklch(0.64 0.010 255)" }}>
-          SYS / ALERTS
+          ALERTS
         </span>
 
         <input
+          ref={searchRef}
           type="search"
           placeholder="Search…"
           value={search}
@@ -118,6 +148,9 @@ export function AlertsClient() {
         <span className="mono text-[0.65rem]" style={{ color: "oklch(0.62 0.010 255)" }}>
           [{isLoading ? "…" : filtered.length}]
         </span>
+        <span className="mono text-[0.55rem] tracking-widest hidden sm:inline" style={{ color: "oklch(0.38 0.010 255)" }}>
+          / search · j/k nav · esc close
+        </span>
 
         <div className="ml-auto">
           <Button
@@ -125,7 +158,6 @@ export function AlertsClient() {
             onClick={handleScan}
             disabled={scanning}
             className="h-7 gap-1.5 text-xs"
-            style={{ background: "oklch(0.72 0.14 200)", color: "oklch(0.10 0.012 255)", border: "none" }}
           >
             <RefreshCw className={cn("h-3 w-3", scanning && "animate-spin")} />
             {scanning ? "Scanning…" : "Scan"}

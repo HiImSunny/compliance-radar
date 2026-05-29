@@ -53,7 +53,7 @@ export function BrightDataClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <span className={MONO} style={DIM}>SYS / BRIGHT DATA</span>
+          <span className={MONO} style={DIM}>BRIGHT DATA</span>
           <p className="text-xs mt-0.5" style={{ color: "oklch(0.44 0.010 255)" }}>
             Web Unlocker + MCP Server integration status
           </p>
@@ -103,14 +103,14 @@ export function BrightDataClient() {
               badge: "ACTIVE",
               desc: "Bypasses geo-restrictions and anti-bot protections on regulatory sites. Used as the primary scraping layer for all configured sources.",
               features: ["Automatic proxy rotation", "JavaScript rendering", "CAPTCHA bypass", "Residential IPs"],
-              docs: "https://docs.brightdata.com/scraping-automation/web-unlocker",
+              docs: "https://docs.brightdata.com/scraping-automation/web-unlocker/introduction",
             },
             {
               name: "MCP Server",
               badge: "ACTIVE",
               desc: "Connects AI agents to live web data via the Model Context Protocol. Used for agent-driven regulatory search and context retrieval.",
               features: ["Real-time web search", "Structured data extraction", "Agent-native API", "OpenAI-compatible"],
-              docs: "https://docs.brightdata.com/scraping-automation/mcp",
+              docs: "https://docs.brightdata.com/ai/mcp-server/overview",
             },
           ].map((product) => (
             <div
@@ -212,7 +212,6 @@ export function BrightDataClient() {
               onClick={handleDemoReplay}
               disabled={replaying}
               className="h-7 gap-1.5 text-xs"
-              style={{ background: "oklch(0.52 0.18 255)", color: "white", border: "none" }}
             >
               <RefreshCw className={`h-3 w-3 ${replaying ? "animate-spin" : ""}`} />
               {replaying ? "Replaying…" : "Run demo replay"}

@@ -53,16 +53,15 @@ export function NavShell({ children }: { children: React.ReactNode }) {
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-2.5 px-3 py-2 rounded-md transition-all duration-150",
-                  active
-                    ? "text-white"
-                    : "hover:text-white"
+                  "flex items-center gap-2.5 px-3 py-2 rounded-md transition-all duration-200",
+                  active ? "text-white" : "hover:text-white"
                 )}
                 style={{
                   background: active ? "oklch(0.52 0.18 255 / 0.2)" : "transparent",
                   color: active ? "oklch(0.86 0.008 255)" : "oklch(0.52 0.010 255)",
                   outline: active ? "1px solid oklch(0.52 0.18 255 / 0.25)" : "none",
                   outlineOffset: "-1px",
+                  transform: active ? "translateX(2px)" : "translateX(0)",
                 }}
               >
                 <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -79,10 +78,9 @@ export function NavShell({ children }: { children: React.ReactNode }) {
         >
           <div className="flex items-center gap-1.5 mb-1">
             <span
-              className="w-1.5 h-1.5 rounded-full shrink-0"
+              className={`w-1.5 h-1.5 rounded-full shrink-0 ${health?.status === "ok" ? "dot-breathe" : ""}`}
               style={{
                 background: health?.status === "ok" ? "oklch(0.60 0.18 155)" : "oklch(0.60 0.22 22)",
-                boxShadow: health?.status === "ok" ? "0 0 4px oklch(0.60 0.18 155)" : "none",
               }}
             />
             <span className={`${MONO} text-[0.55rem]`} style={{ color: "oklch(0.44 0.010 255)" }}>
@@ -103,7 +101,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* ── Page content ── */}
-      <div className="flex-1 overflow-hidden flex flex-col min-w-0">
+      <div className="flex-1 overflow-hidden flex flex-col min-w-0 animate-fade-in">
         {children}
       </div>
     </div>

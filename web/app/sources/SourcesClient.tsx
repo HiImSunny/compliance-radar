@@ -44,7 +44,7 @@ export function SourcesClient() {
     try {
       await api.patchSource(source.id, { active: !source.active });
       await mutate();
-    } catch { /* ignore */ } finally {
+    } catch (e) { console.error("Toggle source failed:", e); } finally {
       setTogglingId(null);
     }
   }
@@ -55,7 +55,7 @@ export function SourcesClient() {
       await api.scanSource(sourceId);
       // Give backend a moment then revalidate
       setTimeout(() => { revalidateAll(); }, 2000);
-    } catch { /* ignore */ } finally {
+    } catch (e) { console.error("Scan source failed:", e); } finally {
       setScanningId(null);
     }
   }
@@ -71,7 +71,7 @@ export function SourcesClient() {
       await api.patchSource(sourceId, editForm);
       await mutate();
       setEditingId(null);
-    } catch { /* ignore */ } finally {
+    } catch (e) { console.error("Save edit failed:", e); } finally {
       setSavingEditId(null);
     }
   }
@@ -81,7 +81,7 @@ export function SourcesClient() {
       <div className="flex items-center justify-between">
         <div>
           <span className="mono text-[0.60rem] tracking-widest uppercase" style={{ color: "oklch(0.52 0.010 255)" }}>
-            SYS / SOURCES
+            SOURCES
           </span>
           <p className="text-xs mt-0.5" style={{ color: "oklch(0.44 0.010 255)" }}>
             {isLoading ? "Loading…" : `${sources.filter((s) => s.active).length} active · ${sources.length} total`}
@@ -91,7 +91,6 @@ export function SourcesClient() {
           size="sm"
           onClick={() => setAdding((v) => !v)}
           className="gap-1.5 text-xs h-7"
-          style={{ background: "oklch(0.52 0.18 255)", color: "white", border: "none" }}
         >
           <Plus className="h-3.5 w-3.5" />
           Add source
@@ -149,13 +148,11 @@ export function SourcesClient() {
           </div>
           {error && <p className="mono text-[0.60rem]" style={{ color: "oklch(0.60 0.22 22)" }}>{error}</p>}
           <div className="flex gap-2">
-            <Button type="submit" size="sm" disabled={saving} className="h-7 text-xs"
-              style={{ background: "oklch(0.52 0.18 255)", color: "white", border: "none" }}>
+            <Button type="submit" size="sm" disabled={saving} className="h-7 text-xs">
               {saving ? "Saving…" : "Add source"}
             </Button>
             <Button type="button" size="sm" variant="outline" className="h-7 text-xs"
-              onClick={() => { setAdding(false); setError(null); }}
-              style={{ borderColor: "oklch(0.28 0.012 255)", color: "oklch(0.58 0.010 255)" }}>
+              onClick={() => { setAdding(false); setError(null); }}>
               Cancel
             </Button>
           </div>
