@@ -17,12 +17,13 @@ type Priority = "HIGH" | "WARNING" | "INFO" | "RESOLVED";
 
 // Static definition of standards (no scores — scores are computed from live data)
 const STANDARD_DEFS = [
-  { id: "gdpr",     name: "GDPR Compliance",   color: "oklch(0.60 0.18 155)" },
-  { id: "soc2",     name: "SOC2 Type II",       color: "oklch(0.68 0.20 42)"  },
-  { id: "iso27001", name: "ISO 27001 ISMS",     color: "oklch(0.60 0.22 22)"  },
-  { id: "hipaa",    name: "HIPAA Healthcare",   color: "oklch(0.72 0.18 280)" },
-  { id: "finra",    name: "FINRA Rules",        color: "oklch(0.72 0.14 200)" },
-  { id: "sec",      name: "SEC Cybersecurity",  color: "oklch(0.68 0.16 60)"  },
+  { id: "gdpr",        name: "GDPR Compliance",   color: "oklch(0.60 0.18 155)" },
+  { id: "soc2",        name: "SOC2 Type II",       color: "oklch(0.68 0.20 42)"  },
+  { id: "iso27001",    name: "ISO 27001 ISMS",     color: "oklch(0.60 0.22 22)"  },
+  { id: "gdpr_soc2",   name: "GDPR + SOC2 Combo",  color: "oklch(0.65 0.16 180)" },
+  { id: "hipaa",       name: "HIPAA Healthcare",   color: "oklch(0.72 0.18 280)" },
+  { id: "finra",       name: "FINRA Rules",        color: "oklch(0.72 0.14 200)" },
+  { id: "sec",         name: "SEC Cybersecurity",  color: "oklch(0.68 0.16 60)"  },
 ];
 
 function sevToPriority(sev: string): Priority {
@@ -87,6 +88,12 @@ function computeComplianceScores(alerts: Alert[]) {
       name: "ISO 27001 ISMS",
       keywords: ["iso 27001", "iso27001", "isms", "vulnerability", "patch", "access registry", "audit log", "information security"],
       color: "oklch(0.60 0.22 22)",
+    },
+    {
+      id: "gdpr_soc2",
+      name: "GDPR + SOC2 Combo",
+      keywords: ["gdpr", "soc2", "soc 2", "personal data", "access control", "mfa", "consent", "authentication", "privacy", "availability"],
+      color: "oklch(0.65 0.16 180)",
     },
     {
       id: "hipaa",
