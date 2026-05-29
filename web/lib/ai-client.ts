@@ -20,7 +20,7 @@ export interface AIResponse {
 
 const AIMLAPI_BASE_URL = process.env.AIMLAPI_BASE_URL ?? "https://api.aimlapi.com/v1";
 const AIMLAPI_DEFAULT_MODEL = process.env.AIMLAPI_MODEL ?? "gpt-4o";
-const GEMINI_DEFAULT_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+const GEMINI_DEFAULT_MODEL = process.env.GEMINI_MODEL ?? "gemini-3.1-flash-lite";
 
 async function callAIMLAPI(messages: ChatMessage[], model = AIMLAPI_DEFAULT_MODEL): Promise<string> {
   const apiKey = process.env.AIMLAPI_KEY;

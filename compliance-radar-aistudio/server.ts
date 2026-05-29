@@ -14,7 +14,7 @@ async function startServer() {
   const app = express();
   app.use(express.json());
 
-  // Detailed compliance evaluation endpoint using Gemini 3.5-flash
+  // Detailed compliance evaluation endpoint using Gemini Flash Lite
   app.post('/api/gemini/audit', async (req, res) => {
     try {
       const apiKey = process.env.GEMINI_API_KEY;
@@ -48,7 +48,7 @@ ${content}
 Be extremely precise. Perform a gap analysis. Identify vulnerabilities, risk levels, specific control sections breached, and provide precise actionable descriptions and mitigation scripts or actions. Return EXACTLY a JSON structure matching the schema. No backticks, no markdown wrapping, just valid JSON.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: process.env.GEMINI_MODEL ?? 'gemini-3.1-flash-lite',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
@@ -121,7 +121,7 @@ Be extremely precise. Perform a gap analysis. Identify vulnerabilities, risk lev
       const { message } = req.body;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: process.env.GEMINI_MODEL ?? 'gemini-3.1-flash-lite',
         contents: message,
         config: {
           systemInstruction: `You are the core intelligence of the Compliance Radar system—an expert AI Security officer and chief compliance auditor.
