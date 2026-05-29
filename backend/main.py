@@ -176,7 +176,7 @@ app = FastAPI(title="ComplianceRadar", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -441,11 +441,68 @@ DEMO_ALERTS = [
 ]
 
 DEMO_SOURCES = [
-    {"id": 1, "name": "SEC Enforcement", "url": "https://www.sec.gov/litigation/litreleases.htm", "active": True, "scan_interval_hours": 6},
-    {"id": 2, "name": "GDPR Enforcement — ICO", "url": "https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/", "active": True, "scan_interval_hours": 12},
-    {"id": 3, "name": "FINRA Rule Updates", "url": "https://www.finra.org/rules-guidance/notices", "active": True, "scan_interval_hours": 6},
-    {"id": 4, "name": "OSHA Hazard Bulletins", "url": "https://www.osha.gov/news/newsreleases", "active": True, "scan_interval_hours": 24},
-    {"id": 5, "name": "FTC Consumer Protection", "url": "https://www.ftc.gov/news-events/news/press-releases", "active": True, "scan_interval_hours": 12},
+    # US Securities & Finance
+    {"name": "SEC Enforcement Actions",       "url": "https://www.sec.gov/litigation/litreleases.htm",                    "active": True, "scan_interval_hours": 6},
+    {"name": "SEC Press Releases",            "url": "https://www.sec.gov/news/pressreleases",                            "active": True, "scan_interval_hours": 6},
+    {"name": "SEC Rulemaking Activity",       "url": "https://www.sec.gov/rules/proposed.shtml",                         "active": True, "scan_interval_hours": 12},
+    {"name": "FINRA Rule Updates",            "url": "https://www.finra.org/rules-guidance/notices",                     "active": True, "scan_interval_hours": 6},
+    {"name": "FINRA Enforcement Actions",     "url": "https://www.finra.org/rules-guidance/oversight-enforcement/finra-disciplinary-actions", "active": True, "scan_interval_hours": 12},
+    {"name": "CFTC Press Releases",           "url": "https://www.cftc.gov/PressRoom/PressReleases",                     "active": True, "scan_interval_hours": 12},
+    {"name": "OCC Bulletins",                 "url": "https://www.occ.gov/news-issuances/bulletins/index-bulletins.html","active": True, "scan_interval_hours": 24},
+    {"name": "Federal Reserve Supervision",   "url": "https://www.federalreserve.gov/supervisionreg/enforcementactions.htm", "active": True, "scan_interval_hours": 24},
+    {"name": "FDIC Press Releases",           "url": "https://www.fdic.gov/news/press-releases/",                        "active": True, "scan_interval_hours": 24},
+    {"name": "FinCEN Advisories",             "url": "https://www.fincen.gov/",                      "active": True, "scan_interval_hours": 24},
+    # US Consumer & Trade
+    {"name": "FTC Press Releases",            "url": "https://www.ftc.gov/news-events/news/press-releases",              "active": True, "scan_interval_hours": 12},
+    {"name": "FTC Business Guidance",         "url": "https://www.ftc.gov/business-guidance",                           "active": True, "scan_interval_hours": 24},
+    {"name": "CFPB Newsroom",                 "url": "https://www.consumerfinance.gov/about-us/newsroom/",               "active": True, "scan_interval_hours": 12},
+    {"name": "CFPB Enforcement Actions",      "url": "https://www.consumerfinance.gov/enforcement/actions/",             "active": True, "scan_interval_hours": 12},
+    # US Workplace & Safety
+    {"name": "OSHA News Releases",            "url": "https://www.osha.gov/news/newsreleases",                           "active": True, "scan_interval_hours": 24},
+    {"name": "OSHA Enforcement",              "url": "https://www.osha.gov/enforcement",                                 "active": True, "scan_interval_hours": 24},
+    {"name": "EEOC Press Releases",           "url": "https://www.eeoc.gov/newsroom/press-releases",                    "active": True, "scan_interval_hours": 24},
+    {"name": "DOL Wage & Hour News",          "url": "https://www.dol.gov/newsroom/releases/whd",                       "active": True, "scan_interval_hours": 24},
+    # US Healthcare
+    {"name": "HHS OCR HIPAA Enforcement",     "url": "https://www.hhs.gov/hipaa/for-professionals/compliance-enforcement/agreements/index.html", "active": True, "scan_interval_hours": 24},
+    {"name": "FDA Safety Alerts",             "url": "https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts", "active": True, "scan_interval_hours": 12},
+    {"name": "CMS Compliance Guidance",       "url": "https://www.cms.gov/",              "active": True, "scan_interval_hours": 48},
+    # US Cybersecurity
+    {"name": "CISA Alerts & Advisories",      "url": "https://www.cisa.gov/news-events/cybersecurity-advisories",       "active": True, "scan_interval_hours": 6},
+    {"name": "NIST Cybersecurity News",       "url": "https://www.nist.gov/cybersecurity",                              "active": True, "scan_interval_hours": 24},
+    {"name": "FBI Cyber Division Alerts",     "url": "https://www.ic3.gov/",                           "active": True, "scan_interval_hours": 12},
+    # EU / GDPR
+    {"name": "ICO News & Blogs",              "url": "https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/",   "active": True, "scan_interval_hours": 12},
+    {"name": "ICO Enforcement Actions",       "url": "https://ico.org.uk/action-weve-taken/enforcement/",               "active": True, "scan_interval_hours": 12},
+    {"name": "EDPB Press Releases",           "url": "https://www.edpb.europa.eu/news/news_en",                         "active": True, "scan_interval_hours": 12},
+    {"name": "CNIL Actualités (France DPA)",  "url": "https://www.cnil.fr/en/news",                                     "active": True, "scan_interval_hours": 24},
+    {"name": "DPC Ireland Decisions",         "url": "https://www.dataprotection.ie/en/news-media",                     "active": True, "scan_interval_hours": 24},
+    # EU Financial & Markets
+    {"name": "EBA Press Releases",            "url": "https://www.eba.europa.eu/publications-and-media/press-releases",               "active": True, "scan_interval_hours": 12},
+    {"name": "ESMA Press Releases",           "url": "https://www.esma.europa.eu/press-news/esma-news",                 "active": True, "scan_interval_hours": 12},
+    {"name": "ECB Banking Supervision",       "url": "https://www.bankingsupervision.europa.eu/press/pr/html/index.en.html", "active": True, "scan_interval_hours": 24},
+    # UK
+    {"name": "FCA Press Releases",            "url": "https://www.fca.org.uk/news/press-releases",                      "active": True, "scan_interval_hours": 6},
+    {"name": "FCA Enforcement Actions",       "url": "https://www.fca.org.uk/news/enforcement-actions",                 "active": True, "scan_interval_hours": 12},
+    {"name": "PRA Publications",              "url": "https://www.bankofengland.co.uk/prudential-regulation","active": True, "scan_interval_hours": 24},
+    # International Standards
+    {"name": "ISO News",                      "url": "https://www.iso.org/news.html",                                   "active": True, "scan_interval_hours": 48},
+    {"name": "FATF Outcomes",                 "url": "https://www.fatf-gafi.org/en/publications.html", "active": True, "scan_interval_hours": 48},
+    {"name": "BIS Publications",              "url": "https://www.bis.org/press/index.htm",                             "active": True, "scan_interval_hours": 24},
+    # AI & Emerging Tech
+    {"name": "EU AI Act Updates",             "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", "active": True, "scan_interval_hours": 24},
+    {"name": "NIST AI Risk Management",       "url": "https://www.nist.gov/artificial-intelligence",                    "active": True, "scan_interval_hours": 48},
+    {"name": "FTC AI Guidance",               "url": "https://www.ftc.gov/business-guidance/blog",                      "active": True, "scan_interval_hours": 24},
+    # Environmental & ESG
+    {"name": "EPA Enforcement Actions",       "url": "https://www.epa.gov/enforcement/enforcement-news",                "active": True, "scan_interval_hours": 24},
+    {"name": "SEC ESG Disclosure Rules",      "url": "https://www.sec.gov/rules/final.shtml",               "active": True, "scan_interval_hours": 48},
+    {"name": "GRI Standards Updates",         "url": "https://www.globalreporting.org/news/",                           "active": True, "scan_interval_hours": 48},
+    # Crypto & Digital Assets
+    {"name": "CFTC Digital Assets",           "url": "https://www.cftc.gov/digitalassets/index.htm",                    "active": True, "scan_interval_hours": 12},
+    {"name": "SEC Crypto Enforcement",        "url": "https://www.sec.gov/spotlight/cybersecurity",                     "active": True, "scan_interval_hours": 12},
+    {"name": "FinCEN Crypto Guidance",        "url": "https://www.fincen.gov/resources/statutes-regulations/guidance",  "active": True, "scan_interval_hours": 24},
+    # Healthcare / Pharma
+    {"name": "EMA Regulatory News",           "url": "https://www.ema.europa.eu/en/news-events",                   "active": True, "scan_interval_hours": 24},
+    {"name": "MHRA Enforcement",              "url": "https://www.gov.uk/government/organisations/medicines-and-healthcare-products-regulatory-agency/about/our-governance", "active": True, "scan_interval_hours": 48},
 ]
 
 
@@ -455,53 +512,70 @@ async def demo_replay():
     db = get_db()
 
     if db is not None:
-        # Wipe & re-seed sources
+        # Wipe alerts & documents, keep sources intact then re-seed missing ones
         try:
             db.table("alerts").delete().gte("id", 1).execute()
             db.table("documents").delete().gte("id", 1).execute()
-            db.table("regulatory_sources").delete().gte("id", 1).execute()
         except Exception as e:
             logger.warning(f"Demo replay cleanup: {e}")
 
+        # Upsert all 50 sources (skip existing by URL)
+        existing = db.table("regulatory_sources").select("url").execute()
+        existing_urls = {row["url"] for row in (existing.data or [])}
+        now_ts = datetime.now(timezone.utc).isoformat()
+        added_sources = 0
         for src in DEMO_SOURCES:
-            try:
-                db.table("regulatory_sources").insert({
-                    "name": src["name"],
-                    "url": src["url"],
-                    "active": src["active"],
-                    "scan_interval_hours": src["scan_interval_hours"],
-                    "last_scan_at": datetime.now(timezone.utc).isoformat(),
-                }).execute()
-            except Exception:
-                pass
+            if src["url"] not in existing_urls:
+                try:
+                    db.table("regulatory_sources").insert({
+                        "name": src["name"],
+                        "url": src["url"],
+                        "active": src["active"],
+                        "scan_interval_hours": src["scan_interval_hours"],
+                        "last_scan_at": None,
+                        "created_at": now_ts,
+                    }).execute()
+                    added_sources += 1
+                except Exception:
+                    pass
 
+        # Re-fetch source IDs to map demo alerts
+        sources_res = db.table("regulatory_sources").select("id, url").execute()
+        url_to_id = {row["url"]: row["id"] for row in (sources_res.data or [])}
+
+        seeded_alerts = 0
         for alert in DEMO_ALERTS:
+            src_url = alert.get("source_url", "")
+            source_id = url_to_id.get(src_url, alert["source_id"])
             try:
-                db.table("documents").insert({
-                    "source_id": alert["source_id"],
+                doc_res = db.table("documents").insert({
+                    "source_id": source_id,
                     "content_hash": hash_content(alert["summary"]),
                     "raw_html": f"<html><body>{alert['summary']}</body></html>",
                     "scraped_at": alert["created_at"],
                 }).execute()
+                doc_id = doc_res.data[0]["id"] if doc_res.data else None
             except Exception:
-                pass
+                doc_id = None
             try:
                 db.table("alerts").insert({
-                    "source_id": alert["source_id"],
-                    "document_id": alert["document_id"],
+                    "source_id": source_id,
+                    "document_id": doc_id,
                     "severity": alert["severity"],
                     "summary": alert["summary"],
                     "impacted_depts": alert["impacted_depts"],
                     "remediation_steps": alert["remediation_steps"],
                     "created_at": alert["created_at"],
                 }).execute()
+                seeded_alerts += 1
             except Exception:
                 pass
 
-        logger.info("Demo replay: seeded 5 sources and 5 alerts into Supabase")
+        total_sources = len(existing_urls) + added_sources
+        logger.info(f"Demo replay: {total_sources} sources, {seeded_alerts} alerts in Supabase")
 
     return {
-        "message": "Demo replay complete — 5 sources and 5 alerts loaded",
+        "message": f"Demo replay complete — {len(DEMO_SOURCES)} sources, {len(DEMO_ALERTS)} alerts loaded",
         "sources": DEMO_SOURCES,
         "alerts": DEMO_ALERTS,
     }

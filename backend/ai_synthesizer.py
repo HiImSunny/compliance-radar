@@ -63,7 +63,7 @@ class AISynthesizer:
 
         try:
             response = await self._client.aio.models.generate_content(
-                model="gemini-2.5-flash-preview-05-20",
+                model=settings.gemini_model,
                 contents=prompt,
             )
             text = response.text.strip()

@@ -5,7 +5,7 @@ from mcp_client import mcp_client
 
 class ScrapeEngine:
     def __init__(self):
-        self.api_url = "https://api.brightdata.com/request"
+        self.api_url = settings.brightdata_api_url
         self.headers = {"Authorization": f"Bearer {settings.brightdata_token}"}
 
     async def scrape(self, url: str, country: str = "") -> str:
