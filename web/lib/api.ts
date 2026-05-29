@@ -47,5 +47,5 @@ export const api = {
     patch<Source>(`/api/v1/sources/${id}`, body),
   scan: () => post<{ message: string }>("/api/v1/scan"),
   scanSource: (id: number) => post<{ message: string }>(`/api/v1/sources/${id}/scan`),
-  demoReplay: () => post<{ message: string; sources: Source[]; alerts: Alert[] }>("/api/v1/demo/replay"),
+  demoReplay: (force = false) => post<{ message: string; sources: Source[]; alerts: Alert[] }>(`/api/v1/demo/replay${force ? "?force=true" : ""}`),
 };

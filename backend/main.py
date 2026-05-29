@@ -507,11 +507,18 @@ DEMO_SOURCES = [
 
 
 @app.post("/api/v1/demo/replay")
-async def demo_replay():
+async def demo_replay(force: bool = Query(False)):
     """Seed the database with demo data and return the full alert set — no external calls."""
     db = get_db()
 
     if db is not None:
+        existing_alerts = db.table("alerts").select("id").limit(1).execute()
+        if existing_alerts.data and not force:
+            raise HTTPException(
+                status_code=409,
+                detail="Demo replay would overwrite existing alerts. Re-run with ?force=true only if you intentionally want to reset demo data.",
+            )
+
         # Wipe alerts & documents, keep sources intact then re-seed missing ones
         try:
             db.table("alerts").delete().gte("id", 1).execute()

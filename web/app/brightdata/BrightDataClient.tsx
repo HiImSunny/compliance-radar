@@ -36,10 +36,11 @@ export function BrightDataClient() {
   const activeSources = sources.filter((s) => s.active).length;
 
   async function handleDemoReplay() {
+    if (!confirm("Demo Replay replaces existing alerts/documents. Continue?")) return;
     setReplaying(true);
     setReplayMsg(null);
     try {
-      const res = await api.demoReplay();
+      const res = await api.demoReplay(true);
       setReplayMsg(res.message);
     } catch (e: unknown) {
       setReplayMsg(e instanceof Error ? e.message : "Replay failed");
@@ -204,7 +205,7 @@ export function BrightDataClient() {
         >
           <p className="text-xs leading-relaxed" style={{ color: "oklch(0.58 0.010 255)" }}>
             Seeds the database with 5 realistic regulatory alerts from SEC, GDPR/ICO, FINRA, OSHA, and FTC.
-            No external API calls — works offline. Use this to demonstrate the full pipeline to judges.
+            This replaces existing alerts/documents. Use only for demos.
           </p>
           <div className="flex items-center gap-3">
             <Button
