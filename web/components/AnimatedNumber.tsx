@@ -14,10 +14,10 @@ interface Props {
  * Eases out with a cubic curve so it decelerates naturally.
  */
 export function AnimatedNumber({ value, duration = 800, className, style }: Props) {
-  const [display, setDisplay] = useState(0);
+  const [display, setDisplay] = useState(value); // init to value, not 0
   const startRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
-  const prevValueRef = useRef(0);
+  const prevValueRef = useRef(value);
 
   useEffect(() => {
     const from = prevValueRef.current;

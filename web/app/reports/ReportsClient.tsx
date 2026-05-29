@@ -267,7 +267,7 @@ export function ReportsClient() {
                         className="mono text-sm font-bold w-6 text-right tabular-nums"
                         style={{ color: count > 0 ? SEV_COLORS[sev] : "oklch(0.38 0.010 255)" }}
                       >
-                        {count > 0 ? <AnimatedNumber value={count} duration={600} /> : "0"}
+                        {count}
                       </span>
                       <span className={`${MONO_LABEL} w-8 text-right`} style={{ color: "oklch(0.38 0.010 255)" }}>
                         {pct}%
@@ -313,7 +313,7 @@ export function ReportsClient() {
                         className="mono text-sm font-bold w-6 text-right tabular-nums"
                         style={{ color: "oklch(0.72 0.14 200)" }}
                       >
-                        <AnimatedNumber value={count} duration={500} />
+                        {count}
                       </span>
                     </div>
                   ))}
