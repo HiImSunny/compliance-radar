@@ -1,5 +1,5 @@
 /**
- * Unified AI client — tries Gemini first, falls back to AIML API.
+ * Unified AI client — tries AIML API first, falls back to Gemini.
  * Both providers are OpenAI-compatible for chat completions.
  * AIML API base: https://api.aimlapi.com/v1
  */
@@ -76,11 +76,11 @@ export async function aiChat(
   const hasGemini = !!process.env.GEMINI_API_KEY;
   const hasAIML = !!process.env.AIMLAPI_KEY;
 
-  // Determine order: preferred first, then fallback
+  // Determine order: preferred first, otherwise AIML API first with Gemini fallback
   const order: AIProvider[] =
-    preferredProvider === "aimlapi"
-      ? ["aimlapi", "gemini"]
-      : ["gemini", "aimlapi"];
+    preferredProvider === "gemini"
+      ? ["gemini", "aimlapi"]
+      : ["aimlapi", "gemini"];
 
   const errors: string[] = [];
 

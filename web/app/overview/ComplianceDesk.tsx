@@ -50,7 +50,7 @@ export function ComplianceDesk() {
     `-- CONFIGURATION AUDIT REPORT --\nsystem.environment = "Production"\nnetwork.open_ports = [80, 443, 8080, 22, 3306]\ndatabase.encryption_enabled = false\ns3_bucket.public_access = "READ_WRITE"\nuser_directory.mfa_enforced = false\nlog_retention.days = 5`,
   );
   const [auditStandard, setAuditStandard] = useState("GDPR / SOC2 Combo");
-  const [provider, setProvider] = useState<"gemini" | "aimlapi">("gemini");
+  const [provider, setProvider] = useState<"gemini" | "aimlapi">("aimlapi");
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditErrorMessage, setAuditErrorMessage] = useState<string | null>(null);
@@ -74,7 +74,7 @@ export function ComplianceDesk() {
     setAuditResult(null);
 
     try {
-      const response = await fetch("/api/gemini/audit", {
+      const response = await fetch("/api/llm/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -96,7 +96,7 @@ export function ComplianceDesk() {
         setAuditResult(data);
       }
     } catch (err) {
-      console.error("Gemini audit fetch failed:", err);
+      console.error("AI audit fetch failed:", err);
       setAuditErrorMessage("Network error — could not reach the AI audit endpoint.");
     } finally {
       setIsAuditing(false);
@@ -142,10 +142,10 @@ export function ComplianceDesk() {
           WORKSPACE CORE
         </span>
         <h3 className="text-sm font-bold mt-1.5 mb-1" style={{ color: "oklch(0.94 0.006 255)" }}>
-          Policy Gap Analysis with Gemini AI
+          Policy Gap Analysis with AIML API
         </h3>
         <p className="text-xs leading-relaxed max-w-2xl" style={{ color: "oklch(0.58 0.010 255)" }}>
-          Paste system configuration, suspicious log files, or security policy documents below. Gemini will
+          Paste system configuration, suspicious log files, or security policy documents below. AIML API will
           cross-reference against international compliance standards and your live alert context.
           {alerts.length > 0 && (
             <span style={{ color: "oklch(0.72 0.14 200)" }}>
@@ -171,7 +171,7 @@ export function ComplianceDesk() {
             <div className="flex items-center gap-2">
               {/* Provider toggle */}
               <div className="flex items-center gap-0.5 rounded border px-1 py-0.5" style={{ borderColor: "oklch(0.28 0.012 255)", background: "oklch(0.148 0.012 255)" }}>
-                {(["gemini", "aimlapi"] as const).map((p) => (
+                {(["aimlapi", "gemini"] as const).map((p) => (
                   <button
                     key={p}
                     onClick={() => setProvider(p)}

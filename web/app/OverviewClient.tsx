@@ -159,7 +159,7 @@ export function OverviewClient() {
   const criticalAlertCount = liveAlerts.filter((a) => a.severity === "critical").length;
   const openAlertCount = liveAlerts.filter((a) => a.severity !== "low").length;
 
-  // Real AI triage — calls Gemini with full alert context
+  // Real AI triage — calls AIML API first, Gemini fallback, with full alert context
   const handleTriageIncident = useCallback(async (inc: Incident) => {
     if (triagingIds.has(inc.id)) return;
     setTriagingIds((prev) => new Set(prev).add(inc.id));
@@ -174,14 +174,14 @@ export function OverviewClient() {
       `\nProvide: (1) root cause assessment, (2) immediate actions with specific commands, (3) timeline recommendation.`;
 
     try {
-      const res = await fetch("/api/gemini/chat", {
+      const res = await fetch("/api/llm/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: prompt }),
       });
       const data = await res.json();
       const text = data.isMock
-        ? "Gemini API unavailable — check GEMINI_API_KEY in web/.env.local."
+        ? "AI providers unavailable — check AIMLAPI_KEY and GEMINI_API_KEY in web/.env.local."
         : (data.text ?? "No response.");
       setTriageResults((prev) => ({ ...prev, [inc.id]: text }));
     } catch {

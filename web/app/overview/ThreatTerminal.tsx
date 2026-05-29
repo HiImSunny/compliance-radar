@@ -182,7 +182,7 @@ export function ThreatTerminal() {
     { sender: "ai" | "user"; text: string; time: string; isError?: boolean; provider?: string }[]
   >([]);
   const [isSendingChat, setIsSendingChat] = useState(false);
-  const [provider, setProvider] = useState<"gemini" | "aimlapi">("gemini");
+  const [provider, setProvider] = useState<"gemini" | "aimlapi">("aimlapi");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Set initial greeting once live data loads
@@ -218,7 +218,7 @@ export function ThreatTerminal() {
     const context = buildSystemContext(alerts, sources, health);
 
     try {
-      const response = await fetch("/api/gemini/chat", {
+      const response = await fetch("/api/llm/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsgText, context, provider }),
@@ -248,7 +248,7 @@ export function ThreatTerminal() {
         ]);
       }
     } catch (err) {
-      console.error("Gemini chat fetch failed:", err);
+      console.error("AI chat fetch failed:", err);
       setChatMessages((prev) => [
         ...prev,
         {
@@ -285,7 +285,7 @@ export function ThreatTerminal() {
           <div className="flex items-center gap-3">
             {/* Provider selector */}
             <div className="flex items-center gap-1 rounded border px-1.5 py-0.5" style={{ borderColor: "oklch(0.52 0.18 255 / 0.3)", background: "oklch(0.148 0.012 255)" }}>
-              {(["gemini", "aimlapi"] as const).map((p) => (
+              {(["aimlapi", "gemini"] as const).map((p) => (
                 <button
                   key={p}
                   onClick={() => setProvider(p)}
