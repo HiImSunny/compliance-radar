@@ -367,9 +367,10 @@ export function OverviewClient() {
           </div>
         </div>
 
-        {activeTab === "radar" && <RadarSphere />}
-        {activeTab === "audit" && <ComplianceDesk />}
-        {activeTab === "intelligence" && <ThreatTerminal />}
+        {/* Keep all tabs mounted — use visibility to preserve state across tab switches */}
+        <div className={activeTab === "radar" ? "contents" : "hidden"}><RadarSphere /></div>
+        <div className={activeTab === "audit" ? "contents" : "hidden"}><ComplianceDesk /></div>
+        <div className={activeTab === "intelligence" ? "contents" : "hidden"}><ThreatTerminal /></div>
       </section>
 
       {/* ── Right Sidebar: Live Alert Register ── */}

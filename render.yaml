@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: compliance-radar-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.1-flash-lite
+      - key: BRIGHTDATA_TOKEN
+        sync: false
+      - key: BRIGHTDATA_ZONE
+        value: unlocker
+      - key: BRIGHTDATA_API_URL
+        value: https://api.brightdata.com/request
+      - key: AIMLAPI_KEY
+        sync: false
+      - key: AIMLAPI_BASE_URL
+        value: https://api.aimlapi.com/v1
+      - key: AIMLAPI_MODEL
+        value: gpt-4o
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false   # set to your Vercel URL after deploy, e.g. https://compliance-radar.vercel.app

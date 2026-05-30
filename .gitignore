@@ -13,3 +13,8 @@ venv/
 .impeccable/
 frontend/
 .vscode/
+
+# Internal working files — not for repo
+DEMO_VIDEO_GUIDE.md
+README_UPDATES.md
+SUBMISSION.md

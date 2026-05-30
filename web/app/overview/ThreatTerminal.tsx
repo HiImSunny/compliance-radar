@@ -157,18 +157,27 @@ function buildSystemContext(
 
     lines.push(`\nAlert summary: ${critical.length} critical, ${high.length} high, ${medium.length} medium, ${low.length} low`);
 
-    const recent = [...alerts]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 8);
+    // Include ALL alerts with FULL details so AI can answer specific questions
+    const sorted = [...alerts].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
-    lines.push("\nMost recent alerts:");
-    recent.forEach((a) => {
-      lines.push(`  [${a.severity.toUpperCase()}] ${a.source_name ?? `Source ${a.source_id}`}: ${a.summary.slice(0, 120)}...`);
-      if (a.impacted_depts) lines.push(`    Impacted: ${a.impacted_depts}`);
+    lines.push("\n=== ALL ALERTS (full detail) ===");
+    sorted.forEach((a, idx) => {
+      lines.push(`\n--- Alert #${idx + 1} ---`);
+      lines.push(`ID: ${a.id}`);
+      lines.push(`Severity: ${a.severity.toUpperCase()}`);
+      lines.push(`Source: ${a.source_name ?? `Source ${a.source_id}`}`);
+      if (a.source_url) lines.push(`Source URL: ${a.source_url}`);
+      lines.push(`Summary: ${a.summary}`);
+      if (a.impacted_depts) lines.push(`Impacted departments: ${a.impacted_depts}`);
+      if (a.remediation_steps) lines.push(`Remediation steps:\n${a.remediation_steps}`);
+      lines.push(`Created at: ${new Date(a.created_at).toLocaleString()}`);
     });
+    lines.push("\n=== END ALERTS ===");
   }
 
-  lines.push("=== END SYSTEM STATE ===");
+  lines.push("\n=== END SYSTEM STATE ===");
   return lines.join("\n");
 }
 
